@@ -21,101 +21,98 @@ from scipy.stats import pearsonr, spearmanr
 from env import get_connection
 import prepare
 
-
 # turn off pink boxes for demo
 import warnings
 warnings.filterwarnings("ignore")
 
-def remove_outliers(df, k=2):
-    '''
-    This function is to remove the top 25% and bottom 25% of the data for each column.
-    This removes the top and bottom 50% for every column to ensure all outliers are gone.
-    '''
-    a=[]
-    b=[]
-    fences=[a, b]
-    features= []
-    col_list = []
-    i=0
-    for col in df:
-            new_df=np.where(df[col].nunique()>8, True, False)
-            if new_df==True:
-                if df[col].dtype == 'float' or df[col].dtype == 'int':
-                    '''
-                    for each feature find the first and third quartile
-                    '''
-                    q1, q3 = df[col].quantile([.25, .75])
-                    '''
-                    calculate inter quartile range
-                    '''
-                    iqr = q3 - q1
-                    '''
-                    calculate the upper and lower fence
-                    '''
-                    upper_fence = q3 + (k * iqr)
-                    lower_fence = q1 - (k * iqr)
-                    '''
-                    appending the upper and lower fences to lists
-                    '''
-                    a.append(upper_fence)
-                    b.append(lower_fence)
-                    '''
-                    appending the feature names to a list
-                    '''
-                    features.append(col)
-                    '''
-                    assigning the fences and feature names to a dataframe
-                    '''
-                    var_fences= pd.DataFrame(fences, columns=features, index=['upper_fence', 'lower_fence'])
-                    col_list.append(col)
-                else:
-                    print(col)
-                    print('column is not a float or int')
-            else:
-                print(f'{col} column ignored')
-    '''
-    for loop used to remove the data deemed unecessary
-    '''
-    for col in col_list:
-        df = df[(df[col]<= a[i]) & (df[col]>= b[i])]
-        i+=1
-    return df, var_fences
-
-
-def gimme_wine():
-    red = pd.read_csv('winequality-red.csv')
-    white = pd.read_csv('winequality-white.csv')
-
-    red['color'] = 'red'
-   
-    white['color'] = 'white'
-
-    wine = pd.concat([white, red], ignore_index = True)
-
-    # renaming columns
-
-    wine.rename(columns = {'fixed acidity' : 'fixed_acidity', 'volatile acidity' : 'volatile_acidity', 
-                           'citric acid' : 'citric_acid', 'residual sugar': 'rs', 'free sulfur dioxide': 'free_s02',
-                           'total sulfur dioxide' : 'total_s02'}, inplace = True)
-
-    # calling the function 
-
-    wine, var_fences = remove_outliers(wine)
-
-    #Removing the very few super high quality wines and very few super low quality wines
-
-    wine = wine[wine.quality != 9]
-
-    wine = wine[wine.quality != 3]
-
-    # creating dummy column for colour
-
-    dummies = pd.get_dummies(wine[['color']], drop_first = True)
+def any_given_sunday():
     
-    wine.drop(columns = ['color'], inplace = True)
+    df_adv18 = pd.read_csv('2018_adv.csv')
+    df_adv19 = pd.read_csv('2019_adv.csv')
+    df_adv20 = pd.read_csv('2020_adv.csv')
+    df_adv21 = pd.read_csv('2021_adv.csv')
+    df_adv22 = pd.read_csv('2022_adv.csv')
 
-    # concatenating dummies to the wine dataframe
-
-    wine = pd.concat([wine, dummies], axis = 1)
+    df_std18 = pd.read_csv('2018_std.csv')
+    df_std19 = pd.read_csv('2019_std.csv')
+    df_std20 = pd.read_csv('2020_std.csv')
+    df_std21 = pd.read_csv('2021_std.csv')
+    df_std22 = pd.read_csv('2022_std.csv')
     
-    return wine
+    return df_adv18, df_adv19, df_adv20, df_adv21, df_adv22, df_std18, df_std19, df_std20, df_std21, df_std22
+    
+    
+def drop(df1, df2):
+    
+    adv_stat_cols = ['Rk', 'Age', 'G', 'GS', 'Tgt', 'Cmp', 'Yds', 'Yds/Cmp', 'Yds/Tgt', 
+                'Rat', 'DADOT', 'Air', 'YAC', 'Bltz', 'MTkl', 'MTkl%', '-9999', 'TD']
+    
+    std_stat_cols = ['Rk', 'Age', 'G', 'GS', 'Yds', 'Lng', 'Fmb', 'Yds.1', 'Sfty', 
+                 '-9999', 'Comb', 'Int', 'Sk', 'Tm', 'Pos', 'Solo', 'Ast']
+    
+    df1 = df1.drop(columns = adv_stat_cols)
+    
+    df2 = df2.drop(columns = std_stat_cols)
+    
+    df18 = df1.merge(df2[['TD', 'PD', 'FF', 'FR', 'TD.1', 'TFL', 'QBHits', 
+                                'Player']], on = 'Player', how = 'left')
+    
+    return df18
+
+
+def obsolete_col_drop(df):
+    
+    obsolete_cols = ['Hrry', 'QBKD', 'QBHits', 'Prss', 'TD', 'TD.1']
+    
+    df = df.drop(columns = obsolete_cols)
+    
+    return df
+
+
+def cleanup(df):
+    
+    df['Cmp%'] = df['Cmp%'].str.rstrip('%').astype('float')
+    
+    df = df.fillna(0)
+
+    df = df.replace(to_replace = ['LLB', 'RLB', 'RILB', 'LILB', 'LLB/MLB', 'MLB', 'ROLB', 
+                                  'LOLB', 'LB/RLB', 'LB/RILB', 'LB/ROLB', 'MLB/RLB', 
+                                  'LILB/RIL', 'ROLB/RIL', 'LB/LDE', 'ROLB/LOL', 'RILB/LIL', 
+                                  'RLB/MLB', 'RLB/LLB', 'LB/LILB', 'OLB', 'MLB/RILB', 
+                                  'LOLB/ROL', 'ROLB/LIL', 'LOLB/RDE', 'LB/OLB'], value = 'LB')
+    
+    df = df.replace(to_replace = ['LCB', 'RCB', 'SS', 'FS', 'DB/RCB', 'RCB/SS', 'RCB/DB', 
+                                  'SS/LCB', 'LCB/FS', 'RCB/LCB', 'LCB/RCB', 'FS/SS', 'DB/LCB', 
+                                  'SS/FS', 'RCB/FS', 'DB/FS', 'CB', 'S', 'SS/RLB', 
+                                  'CB/RCB', 'CB/DB', 'DB/S'], value = 'DB')
+    
+    df = df.replace(to_replace = ['DE', 'DT', 'LDE', 'RDE', 'LDT', 'RDT', 'NT', 'RDE/NT', 
+                                  'LDT/RDT', 'LDE/RDE', 'NT/RDT', 'DE/ROLB', 'RDE/LDT', 
+                                  'DE/RDE', 'RDE/LDE', 'DT/FB', 'RDT/LDT', 'DT/DE', 
+                                  'DT/NT', 'DE/LOLB', 'DE/DT', 'LDT/LDE', 'RDT/RDE', 
+                                  'RDT/LDE', 'DE/LDE', 'DE/DL', 'DE/OLB'], value = 'DL')
+    
+    offensive_player = df[(df['Pos'] == 'WR') | (df['Pos'] == 'TE') | (df['Pos'] == 'RB') | 
+                          (df['Pos'] == 'FB') | (df['Pos'] == 'C') | (df['Pos'] == 'RG') | 
+                          (df['Pos'] == 'QB') | (df['Pos'] == 'LG') | (df['Pos'] == 'T') | 
+                          (df['Pos'] == 'LS') | (df['Pos'] == 'RG/C') | (df['Pos'] == 'P') |
+                          (df['Pos'] == 'OL') | (df['Pos'] == 'G') | (df['Pos'] == 'K')].index
+    
+    df = df.drop(offensive_player)
+    
+    df = df[df['Pos'] != 0]
+    
+    df = df.drop_duplicates(subset="Player", keep = 'first')
+    
+    return df
+
+
+
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+
+
