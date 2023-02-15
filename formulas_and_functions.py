@@ -59,70 +59,96 @@ def player_ratings_cols(df):
     df['LBR'] = ((df.Comb * .25) + (df.ppds * .5) + (df.Int * 2.5) + 
                    (df.FF * 1.5) + (df.PD * 2) + (df.TDs * 7))
     
-    df['ovr_rtg'] = round((df.DBR + df.DLR + df.LBR) / 3, 1)
+    df['ODR'] = round((df.DBR + df.DLR + df.LBR) / 3, 1)
      
     return df
 
 
 def drumroll_please(df, rtg):
-    results = df[df['ovr_rtg'] >= rtg]
+    results = df[df['ODR'] >= rtg]
     results.loc[len(results.index)] = ['League Average', 'N/A', 'N/A', df.Int.mean(), df['Cmp%'].mean(),
                                          df.Sk.mean(), df.Comb.mean(), df.PD.mean(), df.FF.mean(),
                                          df.FR.mean(), df.TFL.mean(), df.ppds.mean(), df.TDs.mean(),
-                                         df.DBR.mean(), df.DLR.mean(), df.LBR.mean(), df.ovr_rtg.mean()] 
+                                         df.DBR.mean(), df.DLR.mean(), df.LBR.mean(), df.ODR.mean()] 
     return results
 
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
 
+### Visual functions
 
-
-
-
+def DB_stat_correlation(df):
     
-def t_test(a, b):
-    '''
-    This function will take in two arguments in the form of a continuous and discrete variable and runs
-    an independent t-test and prints whether or not to print whether or not to rejec the Null Hypothesis
-    based on those results
-    '''
-    alpha = 0.05
-    t, p = stats.ttest_ind(a, b, equal_var=False)
-    print("T-Score is: ", t)
-    print("")
-    print("P-Value is: ", p/2)
-    print("")
-    if p / 2 > alpha:
-        print("We fail to reject $H_{0}$")
-    elif t < 0:
-        print("We fail to reject $H_{0}$")
-    else:
-        print("We reject the null hypothesis as there is a\nsignificant relationship between density and quality of wine.")
+    sns.countplot(df['Int'], hue = df.Pos, palette = 'Paired')
+    plt.title('Correlation of Interceptions\nto Overall Defensive Rating', fontdict = { 'fontsize': 20})
+    plt.ylabel('Players per Position', fontdict = { 'fontsize': 15})
+    plt.xlabel('Amount of Interceptions', fontdict = { 'fontsize': 15})
+    plt.text(7, 135, 'Takeaway: This correlation shows that\nInterceptions favor defensive backs\nmore than Linemen or Linebackers', fontsize = 15, bbox = dict(facecolor = 'cyan', alpha = .5))
+    plt.show()
 
-        
-def chi_sq(a, b):
-    '''
-    This function will take in two arguments in the for of two discrete variables and runs a chi^2 test
-    to determine if the the two variables are independent of each other and prints the results based on the findings
-    '''
-    alpha = 0.05
+
+def DL_stat_correlation(df):
     
-    result = pd.crosstab(a, b)
+    sns.relplot(y = 'ppds', x = 'ODR', hue = 'Pos', palette = 'gist_ncar', data = df)
+    plt.title('Pass Play Disruption Score Correlation\nto Overall Rating', fontdict = { 'fontsize': 15})
+    plt.ylabel('Pass Play Disruption Score', fontdict = { 'fontsize': 15})
+    plt.xlabel('Overall Defensive Rating', fontdict = { 'fontsize': 15})
+    plt.show() 
 
-    chi2, p, degf, expected = stats.chi2_contingency(result)
+def ppds_top_5(df):
 
-    print(f'chi^2  = {chi2:.4f}') 
-    print("")
-    print(f'p-value = {p:.4f}')
-    print("")
-    if p / 2 > alpha:
-        print("We fail to reject $H_{0}$")
-    else:
-        print("We reject the null hypothesis as there is a dependence \nbetween the selected feature and quality of wine.")
-        
+    fig, ax = plt.subplots()
+    plt.title('Top 5 Pass Play\nDisruption Leaders')
+    plt.ylabel('Pass PLay Disruption Score')
+    plt.xlabel('Top 5 Players vs. League Average')
+    ax.bar(df['Player'], df['ppds'], 
+           color = ['Red', 'lightcoral', 'limegreen', 
+                    'tomato', 'orangered', 'black'], edgecolor = 'black')
+    ax.set_ylim(0, 140)
+    plt.xticks(rotation=45)
+    plt.text(6, 80, '* - Pro-Bowler', fontsize = 10, bbox = dict(facecolor = 'cyan', alpha = .5))
+    plt.text(6, 65, '+ - 1st Team All-Pro', fontsize = 10, bbox = dict(facecolor = 'cyan', alpha = .5))
 
+    plt.show()
+    
+def LB_tackle_correlation(df):
+    positions = ('LineBacker', 'Defensive Back\n ', 'Defensive Lineman')
+    index = np.arange(3)
+    sns.barplot(y = df.Comb, x = df.Pos, data = df, palette = 'husl', edgecolor = 'black')
+    plt.xticks(ticks = (0, 1, 2), labels = positions)
+    plt.title('Average Tackles by Position', fontdict = { 'fontsize': 15})
+    plt.ylabel('Average Tackles', fontdict = { 'fontsize': 15})
+    plt.xlabel('Positions', fontdict = { 'fontsize': 15})
+    plt.text(2.75, 35, 'Takeaway: Tackles are much more\nsignificant for Linebackers than\nthe other two positions', 
+             fontsize = 15, bbox = dict(facecolor = 'cyan', alpha = .5))
 
+    plt.show()
     
 def model_report():
     data = {'Model': ['Linear Regression', 'Lasso + Lars', 'Polynomial Regression'],
             'Train Predictions': [221977.25, 221977.25, 220570.62],
             'Validate Predictions': [222972.52, 222972.52, 220216.19]}
     return pd.DataFrame(data)
+
+
+
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+###--------------------------------------------------------------------------------------------------------
+
+### Stats functions
+
+def confirm_statistical_correlation(df, var1, var2):
+    r, p_value = spearmanr(var1, var2)
+    if r > .50:
+        print(f'There is a strong positive correlation with an R-value of: {r}\nP-value of: {p_value}')
+    else:
+        print('Garbage')
+        
