@@ -6,14 +6,14 @@ Project Title : Predicting Defensive Player of the Year in the NFL
 
 Project Description :
 
-This project aims to generate a list of players most deserving of the NFL's defensive player of the year based on the players  statistics accumulated for the given season.
+This project aims to generate a list of players most deserving of the NFL's defensive player of the year based on the players statistics accumulated for the given season.
 
 The data was obtained on 26 January 2023 from pro-football-reference.com, it downloaded as ten .csv files (there were 2 files for each year from 2018 to 2022, one consisting of advanced statistical metrics and the other of standard statistical metrics)
 
 Credit for the data goes to :
 pro-football-reference.com
 
-Hypotheses :
+Hypothesis :
 
 Is it possible to predict the defensive player of the year based on player statistics?
 
