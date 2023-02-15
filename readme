@@ -1,0 +1,76 @@
+This repository contains python code and functions for an individual project, predicting the NFL's DPOY, at Codeup, San Antonio, Noether data science cohort, February 2023.
+
+Author : Shawn Smith
+
+Project Title : Predicting Defensive Player of the Year in the NFL
+
+Project Description :
+
+This project aims to generate a list of players most deserving of the NFL's defensive player of the year based on the players  statistics accumulated for the given season.
+
+The data was obtained on 26 January 2023 from pro-football-reference.com, it downloaded as ten .csv files (there were 2 files for each year from 2018 to 2022, one consisting of advanced statistical metrics and the other of standard statistical metrics)
+
+Credit for the data goes to :
+pro-football-reference.com
+
+Hypotheses :
+
+Is it possible to predict the defensive player of the year based on player statistics?
+
+Data Dictionary :
+
+Feature                                Definition
+
+**Player**           Player's Name
+**Tm**               Player's Team (If player was traded mid-season, team will display "2TM")
+**Pos**              Player's Position on Defense (categorized into DL(Defensive Lineman), LB(Linebacker), or DB(Defensive Back)
+**Int**              Completion Percentage allowed when targeted by opposing team
+**Sk**               Number of times opposing QB was tackled before they threw the ball(sacks)
+**Comb**             Total number of Solo Tackles and Tackle assists
+**PD**               Number of Passes Deflected resulting in an incomplete pass
+**FF**               Forced Fumbles caused
+**FR**               Number of Fumbles Recovered
+**TFL**              Tackles that resulted in a loss of yardage
+**ppds**             Pass Play Disruption Score (combines QB hurries, QB knockdowns, QB hits, and sacks)
+**TDs**              Defensive TDs scored
+**DBR**              Defensive Back Rating
+**DLR**              Defensive Lineman Rating
+**LBR**              Linebacker Rating
+**ODR**              Overall Defensive Rating
+
+**The Process / Project Plan :
+
+Obtain, explore and analyze defensive statistics and generate formulas to accurately categorize the best players in the NFL from a defensive standpoint and determine who should win DPOY
+
+Analyze features in the cleaned data based on what statistics weigh more heavily in favor of three main defensive categories, Defensive Backs, Defensive Linemen, and Linebackers. 
+
+Using the most relevant statistics, generate formulas to assign all ratings for each defensive categorical position. 
+
+Using those three new ratings, generate an overall rating formula and assign that score to each player as the target metric.
+
+Provide suggestions and indicate next steps that could be performed.
+
+**For Further Exploration :
+
+Find a way to determine if the player's team success weighs on the outcome of the DPOY voting.
+
+Find a way to see if media attention can cause bias in voters' decision when voting
+
+**Enhance Formulas :
+
+Use media coverage and team success as an added metric to finetune the formula to get an even better result
+
+**Steps To Reproduce :
+
+Assure the presence of a Python environment on your computer.
+
+Import :
+
+Python libraries pandas, numpy, matplotlib, seaborn and scipy,
+The advanced and standard defensive stats databases from https://pro-football-reference.com and save the file locally
+Pre-existing or self-created data 'acquire' and 'prepare' modules.
+Tidy the data.
+
+Explore using graphs, statistical evaluation, feature engineering, finetune formulas
+
+Evaluate, analyse and form conclusions and recommendations and indicate next steps.
