@@ -20,6 +20,7 @@ from scipy.stats import pearsonr, spearmanr
 
 from env import get_connection
 import prepare
+import formulas_and_functions as f
 
 # turn off pink boxes for demo
 import warnings
@@ -42,7 +43,7 @@ def any_given_sunday():
     return df_adv18, df_adv19, df_adv20, df_adv21, df_adv22, df_std18, df_std19, df_std20, df_std21, df_std22
     
     
-def drop(df1, df2):
+def transform(df1, df2):
     
     adv_stat_cols = ['Rk', 'Age', 'G', 'GS', 'Tgt', 'Cmp', 'Yds', 'Yds/Cmp', 'Yds/Tgt', 
                 'Rat', 'DADOT', 'Air', 'YAC', 'Bltz', 'MTkl', 'MTkl%', '-9999', 'TD']
@@ -54,22 +55,26 @@ def drop(df1, df2):
     
     df2 = df2.drop(columns = std_stat_cols)
     
-    df18 = df1.merge(df2[['TD', 'PD', 'FF', 'FR', 'TD.1', 'TFL', 'QBHits', 
+    new_df = df1.merge(df2[['TD', 'PD', 'FF', 'FR', 'TD.1', 'TFL', 'QBHits', 
                                 'Player']], on = 'Player', how = 'left')
     
-    return df18
+    new_df = f.new_stat_cols(new_df)
+    #Calling cleanup function    
+    clean_df = cleanup(new_df) 
+    
+    clean_df = f.player_ratings_cols(clean_df)
+    
+    return clean_df
 
 
-def obsolete_col_drop(df):
+
+
+
+def cleanup(df):
     
     obsolete_cols = ['Hrry', 'QBKD', 'QBHits', 'Prss', 'TD', 'TD.1']
     
     df = df.drop(columns = obsolete_cols)
-    
-    return df
-
-
-def cleanup(df):
     
     df['Cmp%'] = df['Cmp%'].str.rstrip('%').astype('float')
     
