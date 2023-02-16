@@ -74,3 +74,7 @@ Tidy the data.
 Explore using graphs, statistical evaluation, feature engineering, finetune formulas
 
 Evaluate, analyse and form conclusions and recommendations and indicate next steps.
+
+*** Write-up ***
+
+The task was to complete an entire project that encompasses the entire data science pipeline in 3 days and what I decided to do was to predict the outcome of the Defensive Player of the Year award in the NFL from 2018 - 2022. I acquired data, prepped and tidied the data by merging dataframes, removing irrelevant info, and handling null values. I constructed 4 formulas and generated a new statistic that I used to create metrics that ranked players according to their performance. The result was my formula accurately predicting the DPOY in 2018, 2021, and 2022. Overall, my formula was able to identify 84% of all players that received votes for the award. 
